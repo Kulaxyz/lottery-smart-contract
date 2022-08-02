@@ -43,3 +43,5 @@ module.exports = async ({ deployments, getNamedAccounts }) => {
     }
     deployments.log("----------------------------------------------------")
 };
+
+module.exports.tags = ["all", "production", "development"]

@@ -5,9 +5,9 @@ const { localChains } = require('../../helper-hardhat.config.js');
 !localChains.includes(network.name)
 ? describe.skip
 : describe('Lottery', () => {
-    let lottery, interval
+    let lottery, interval, deployer
     beforeEach(async () => {
-        const { deployer } = await getNamedAccounts();
+        deployer = await getNamedAccounts().deployer
         await deployments.fixture(['all']);
         lottery = await ethers.getContract('Lottery', deployer);
         interval = await lottery.callStatic.getInterval();
@@ -18,13 +18,13 @@ const { localChains } = require('../../helper-hardhat.config.js');
             await network.provider.send('evm_increaseTime', [interval.toNumber() + 1]);
             await network.provider.send('evm_mine', []);
 
-            const { performNeeded } = await lottery.callStatic.checkUpkeep("0x0");
-            assert.equal(performNeeded, false);
+            const {upkeepNeeded} = await lottery.callStatic.checkUpkeep([]);
+            assert.equal(upkeepNeeded, false);
         });
 
         it('should fail if no time', async function () {
-            const { performNeeded } = await lottery.callStatic.checkUpkeep(deployer);
-            assert.equal(performNeeded, false);
+            const { upkeepNeeded } = await lottery.callStatic.checkUpkeep([]);
+            assert.equal(upkeepNeeded, false);
         });
     })
 })
